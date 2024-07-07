@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-chart
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-chart
+  template:
+    metadata:
+      labels:
+        app: test-chart
+    spec:
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      containers:
+        - name: test-chart
+          image: nginx
+          ports:
+            - containerPort: 80

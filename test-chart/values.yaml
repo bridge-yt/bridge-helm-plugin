@@ -1,0 +1,3 @@
+# values.yaml
+
+serviceAccountName: "{{ bridge.example-resources.arn }}"

@@ -1,0 +1,11 @@
+name: "bridge"
+version: "0.1.0"
+usage: "A Helm plugin to integrate with Bridge service"
+description: |-
+  This plugin allows you to translate placeholders in Helm templates and register resources with the Bridge service.
+hooks:
+  post-install:
+    - command: bridge deploy
+      args:
+        - "--api-url"
+        - "{{ .Values.bridge.apiUrl }}"

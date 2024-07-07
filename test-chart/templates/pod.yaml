@@ -1,0 +1,11 @@
+# templates/pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: example-pod
+  labels:
+    bridgeRegister: "true"
+spec:
+  containers:
+    - name: nginx
+      image: nginx
