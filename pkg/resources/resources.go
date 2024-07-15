@@ -14,12 +14,13 @@ import (
 func getPodDetails(clientset *kubernetes.Clientset, resource HelmResource) map[string]string {
     pod, err := clientset.CoreV1().Pods(resource.Namespace).Get(context.TODO(), resource.Name, metav1.GetOptions{})
     if err != nil {
-        log.Printf("Failed to get Pod details: %v", err)
+        log.Printf("Failed to get Pod details for %s/%s: %v", resource.Namespace, resource.Name, err)
         return nil
     }
     return map[string]string{
-        "podIP":    pod.Status.PodIP,
-        "nodeName": pod.Spec.NodeName,
+        "namespace": resource.Namespace,
+        "podIP":     pod.Status.PodIP,
+        "nodeName":  pod.Spec.NodeName,
         // Add more Pod-specific details as needed
     }
 }
@@ -27,10 +28,11 @@ func getPodDetails(clientset *kubernetes.Clientset, resource HelmResource) map[s
 func getServiceDetails(clientset *kubernetes.Clientset, resource HelmResource) map[string]string {
     service, err := clientset.CoreV1().Services(resource.Namespace).Get(context.TODO(), resource.Name, metav1.GetOptions{})
     if err != nil {
-        log.Printf("Failed to get Service details: %v", err)
+        log.Printf("Failed to get Service details for %s/%s: %v", resource.Namespace, resource.Name, err)
         return nil
     }
     return map[string]string{
+        "namespace": resource.Namespace,
         "clusterIP": service.Spec.ClusterIP,
         "ports":     strings.Join(getServicePorts(service.Spec.Ports), ","),
         // Add more Service-specific details as needed
@@ -48,11 +50,12 @@ func getServicePorts(ports []corev1.ServicePort) []string {
 func getIngressDetails(clientset *kubernetes.Clientset, resource HelmResource) map[string]string {
     ingress, err := clientset.NetworkingV1().Ingresses(resource.Namespace).Get(context.TODO(), resource.Name, metav1.GetOptions{})
     if err != nil {
-        log.Printf("Failed to get Ingress details: %v", err)
+        log.Printf("Failed to get Ingress details for %s/%s: %v", resource.Namespace, resource.Name, err)
         return nil
     }
     return map[string]string{
-        "host": ingress.Spec.Rules[0].Host,
+        "namespace": resource.Namespace,
+        "host":      ingress.Spec.Rules[0].Host,
         // Add more Ingress-specific details as needed
     }
 }
@@ -60,10 +63,11 @@ func getIngressDetails(clientset *kubernetes.Clientset, resource HelmResource) m
 func getDeploymentDetails(clientset *kubernetes.Clientset, resource HelmResource) map[string]string {
     deployment, err := clientset.AppsV1().Deployments(resource.Namespace).Get(context.TODO(), resource.Name, metav1.GetOptions{})
     if err != nil {
-        log.Printf("Failed to get Deployment details: %v", err)
+        log.Printf("Failed to get Deployment details for %s/%s: %v", resource.Namespace, resource.Name, err)
         return nil
     }
     return map[string]string{
+        "namespace":          resource.Namespace,
         "replicas":           fmt.Sprintf("%d", *deployment.Spec.Replicas),
         "availableReplicas":  fmt.Sprintf("%d", deployment.Status.AvailableReplicas),
         "updatedReplicas":    fmt.Sprintf("%d", deployment.Status.UpdatedReplicas),
@@ -74,10 +78,11 @@ func getDeploymentDetails(clientset *kubernetes.Clientset, resource HelmResource
 func getStatefulSetDetails(clientset *kubernetes.Clientset, resource HelmResource) map[string]string {
     statefulSet, err := clientset.AppsV1().StatefulSets(resource.Namespace).Get(context.TODO(), resource.Name, metav1.GetOptions{})
     if err != nil {
-        log.Printf("Failed to get StatefulSet details: %v", err)
+        log.Printf("Failed to get StatefulSet details for %s/%s: %v", resource.Namespace, resource.Name, err)
         return nil
     }
     return map[string]string{
+        "namespace":        resource.Namespace,
         "replicas":         fmt.Sprintf("%d", *statefulSet.Spec.Replicas),
         "readyReplicas":    fmt.Sprintf("%d", statefulSet.Status.ReadyReplicas),
         "currentReplicas":  fmt.Sprintf("%d", statefulSet.Status.CurrentReplicas),
@@ -88,11 +93,12 @@ func getStatefulSetDetails(clientset *kubernetes.Clientset, resource HelmResourc
 func getConfigMapDetails(clientset *kubernetes.Clientset, resource HelmResource) map[string]string {
     configMap, err := clientset.CoreV1().ConfigMaps(resource.Namespace).Get(context.TODO(), resource.Name, metav1.GetOptions{})
     if err != nil {
-        log.Printf("Failed to get ConfigMap details: %v", err)
+        log.Printf("Failed to get ConfigMap details for %s/%s: %v", resource.Namespace, resource.Name, err)
         return nil
     }
     return map[string]string{
-        "dataKeys": strings.Join(getKeys(configMap.Data), ","),
+        "namespace": resource.Namespace,
+        "dataKeys":  strings.Join(getKeys(configMap.Data), ","),
         // Add more ConfigMap-specific details as needed
     }
 }
@@ -100,12 +106,13 @@ func getConfigMapDetails(clientset *kubernetes.Clientset, resource HelmResource)
 func getSecretDetails(clientset *kubernetes.Clientset, resource HelmResource) map[string]string {
     secret, err := clientset.CoreV1().Secrets(resource.Namespace).Get(context.TODO(), resource.Name, metav1.GetOptions{})
     if err != nil {
-        log.Printf("Failed to get Secret details: %v", err)
+        log.Printf("Failed to get Secret details for %s/%s: %v", resource.Namespace, resource.Name, err)
         return nil
     }
     return map[string]string{
-        "dataKeys": strings.Join(getKeysByte(secret.Data), ","),
-        "type":     string(secret.Type),
+        "namespace": resource.Namespace,
+        "dataKeys":  strings.Join(getKeysByte(secret.Data), ","),
+        "type":      string(secret.Type),
         // Add more Secret-specific details as needed
     }
 }

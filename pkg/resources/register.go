@@ -95,9 +95,9 @@ func getHelmResources(releaseName, namespace string) ([]HelmResource, error) {
             currentResource = nil
         } else if currentResource != nil {
             if strings.HasPrefix(line, "name:") {
-                currentResource.Name = strings.TrimPrefix(line, "name:")
+                currentResource.Name = strings.TrimPrefix(line, "name: ")
             } else if strings.HasPrefix(line, "namespace:") {
-                currentResource.Namespace = strings.TrimPrefix(line, "namespace:")
+                currentResource.Namespace = strings.TrimPrefix(line, "namespace: ")
             } else if strings.Contains(line, "bridgeRegister: true") {
                 currentResource.BridgeRegister = true
             }
@@ -133,7 +133,7 @@ func registerResource(apiURL string, resource HelmResource, clientset *kubernete
 
     resource.Details = details
 
-    url := fmt.Sprintf("%s/resource", apiURL)
+    url := fmt.Sprintf("%s/resource/%s/%s", apiURL, resource.Namespace, resource.Name)
     data := map[string]interface{}{
         "name":          resource.Name,
         "resource_type": resource.Kind,

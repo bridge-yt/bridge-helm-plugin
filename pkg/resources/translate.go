@@ -23,12 +23,13 @@ func Translate(apiURL string) {
     placeholders := extractPlaceholders(content)
     for _, placeholder := range placeholders {
         parts := strings.Split(placeholder, ".")
-        if len(parts) != 3 {
+        if len(parts) != 4 {
             continue
         }
-        resource := parts[1]
-        field := parts[2]
-        value, err := fetchValueFromBridge(apiURL, resource, field)
+        namespace := parts[1]
+        resource := parts[2]
+        field := parts[3]
+        value, err := fetchValueFromBridge(apiURL, namespace, resource, field)
         if err != nil {
             log.Fatalf("Failed to fetch value for %s: %v", placeholder, err)
         }
@@ -55,8 +56,8 @@ func extractPlaceholders(content string) []string {
     return placeholders
 }
 
-func fetchValueFromBridge(apiURL, resource, field string) (string, error) {
-    url := fmt.Sprintf("%s/resource/%s", apiURL, resource)
+func fetchValueFromBridge(apiURL, namespace, resource, field string) (string, error) {
+    url := fmt.Sprintf("%s/resource/%s/%s", apiURL, namespace, resource)
     resp, err := http.Get(url)
     if err != nil {
         return "", err
